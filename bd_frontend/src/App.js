@@ -1,19 +1,55 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './index.css';
 
-// We will create these components in the next steps
-const Home = () => <div className="p-5"><h1>Welcome to BloodDonation</h1><p>Home Page</p></div>;
-const Register = () => <div className="p-5"><h1>Donor Registration</h1></div>;
+// Components
+import Navigation from './components/Navigation';
+
+// Pages
+import Home from './pages/Home';
+import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
+import GalleryPage from './pages/GalleryPage';
+import EventsPage from './pages/EventsPage';
+import AdminLogin from './pages/AdminLogin';
+import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
   return (
     <Router>
-      <div className="App">
-        {/* Navigation bar will go here later */}
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/register" element={<Register />} />
-        </Routes>
+      <div className="App d-flex flex-column min-vh-100">
+        {/* Global Toast Notifications */}
+        <ToastContainer 
+          position="top-right" 
+          autoClose={3000} 
+          hideProgressBar={false} 
+          newestOnTop 
+          closeOnClick 
+          rtl={false} 
+          pauseOnFocusLoss 
+          draggable 
+          pauseOnHover 
+          theme="light" 
+        />
+        
+        {/* Global Navigation Bar (Will hide automatically on admin routes) */}
+        <Navigation />
+        
+        {/* Main Content Area */}
+        <main className="flex-grow-1">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/gallery" element={<GalleryPage />} />
+            <Route path="/events" element={<EventsPage />} />
+            <Route path="/admin" element={<AdminLogin />} />
+            <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          </Routes>
+        </main>
       </div>
     </Router>
   );
