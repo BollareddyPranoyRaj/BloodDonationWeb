@@ -3,35 +3,51 @@ import { Container, Row, Col, Card, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 import { io } from 'socket.io-client';
 import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
   PieChart, Pie, Cell
 } from 'recharts';
+import { API_BASE_URL, SERVER_BASE_URL } from '../config/api';
 
 const Dashboard = () => {
   const [overviewData, setOverviewData] = useState(null);
   const [bloodGroupData, setBloodGroupData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Using the custom port and routing prefix from your app.js
-  const API_BASE_URL = 'http://localhost:7001/blooddonationbackend';
-  const SOCKET_URL = 'http://localhost:7001';
-
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6'];
 
   const fetchDashboardData = async () => {
     try {
-      const [overviewRes, bloodGroupRes] = await Promise.all([
-        axios.get(`${API_BASE_URL}/total-counts`),
-        axios.get(`${API_BASE_URL}/count-by-blood-group`)
+      const [registrationsRes, eventsRes, volunteersRes] = await Promise.all([
+        axios.get(`${API_BASE_URL}/registrations`),
+        axios.get(`${API_BASE_URL}/events`),
+        axios.get(`${API_BASE_URL}/volunteers`)
       ]);
 
-      setOverviewData(overviewRes.data);
+      const registrations = registrationsRes.data || [];
+      const events = eventsRes.data || [];
+      const volunteers = volunteersRes.data || [];
 
-      // Format blood group data for Recharts PieChart
-      const formattedPieData = Object.keys(bloodGroupRes.data).map(key => ({
+      const bloodGroupCounts = registrations.reduce((acc, registration) => {
+        const bloodGroup = registration.bloodgroup || registration.BloodGroup || 'Unknown';
+        acc[bloodGroup] = (acc[bloodGroup] || 0) + 1;
+        return acc;
+      }, {});
+
+      const formattedPieData = Object.keys(bloodGroupCounts).map(key => ({
         name: key,
-        value: bloodGroupRes.data[key]
+        value: bloodGroupCounts[key]
       }));
+
+      setOverviewData({
+        NumberOfDonors: registrations.length,
+        UnitsCollected: registrations.filter((registration) => registration.donated).length,
+        NumberOfBloodCamps: events.length,
+        RegisteredCount: registrations.length,
+        StudentsCount: registrations.length,
+        StaffCount: 0,
+        GuestCount: 0,
+        NumberOfVolunteers: volunteers.length,
+      });
       setBloodGroupData(formattedPieData);
 
     } catch (error) {
@@ -46,7 +62,7 @@ const Dashboard = () => {
     fetchDashboardData();
 
     // Setup Socket.IO for live updates
-    const socket = io(SOCKET_URL, {
+    const socket = io(SERVER_BASE_URL, {
       transports: ["polling", "websocket"],
     });
 
@@ -55,7 +71,7 @@ const Dashboard = () => {
     });
 
     // Listen for the specific event emitted from DonorController.js
-    socket.on('new-registration', (data) => {
+    socket.on('newRegistration', (data) => {
       console.log('Live update received:', data);
       fetchDashboardData(); // Refetch data to update charts/cards instantly
     });
