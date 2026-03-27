@@ -3,13 +3,11 @@ import { Container, Row, Col, Card, Form, Button, Tabs, Tab, Spinner, Badge } fr
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../config/api';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('events');
-
-  // Using the custom port and routing prefix from your app.js
-  const API_BASE_URL = 'http://localhost:7001/blooddonationbackend';
 
   // --- Event Upload State ---
   const [eventData, setEventData] = useState({
@@ -49,15 +47,15 @@ const AdminDashboard = () => {
     // Convert comma-separated string to an array, trim whitespace, then stringify for the backend
     const collegesArray = eventData.Colleges.split(',').map(c => c.trim()).filter(c => c !== '');
     formData.append('Colleges', JSON.stringify(collegesArray));
-    formData.append('image', eventImage);
+    formData.append('eventImage', eventImage);
 
     try {
       // Note: Make sure this endpoint matches the route defined in your backend's MyRouter.js
-      const response = await axios.post(`${API_BASE_URL}/add-event`, formData, {
+      const response = await axios.post(`${API_BASE_URL}/create-event`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      if (response.status === 200) {
+      if (response.status === 200 || response.status === 201) {
         toast.success('Event uploaded successfully!');
         setEventData({ EventName: '', Date: '', Colleges: '' });
         setEventImage(null);
@@ -85,15 +83,15 @@ const AdminDashboard = () => {
 
     setGalleryLoading(true);
     const formData = new FormData();
-    formData.append('image', galleryImage);
+    formData.append('galleryImage', galleryImage);
 
     try {
       // Note: Make sure this endpoint matches the route defined in your backend's MyRouter.js
-      const response = await axios.post(`${API_BASE_URL}/add-gallery`, formData, {
+      const response = await axios.post(`${API_BASE_URL}/upload-gallery`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      if (response.status === 200) {
+      if (response.status === 200 || response.status === 201) {
         toast.success('Gallery image uploaded successfully!');
         setGalleryImage(null);
         document.getElementById('galleryImageInput').value = '';
