@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Spinner, Modal } from 'react-bootstrap';
 import axios from 'axios';
+import { API_BASE_URL, SERVER_BASE_URL } from '../config/api';
 
 const GalleryPage = () => {
   const [images, setImages] = useState([]);
@@ -10,13 +11,10 @@ const GalleryPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
 
-  // Using the custom port and routing prefix from your app.js
-  const API_BASE_URL = 'http://localhost:7001/blooddonationbackend';
-
   useEffect(() => {
     const fetchGalleryImages = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/get-gallery`);
+        const response = await axios.get(`${API_BASE_URL}/gallery`);
         setImages(response.data);
       } catch (error) {
         console.error('Error fetching gallery images:', error);
@@ -64,7 +62,7 @@ const GalleryPage = () => {
         ) : (
           <Row className="g-4">
             {images.map((img) => {
-              const imageUrl = `${API_BASE_URL}/Gallery/${img.filename}`;
+              const imageUrl = `${SERVER_BASE_URL}/Gallery/${img.filename}`;
               return (
                 <Col xs={12} sm={6} md={4} lg={3} key={img._id}>
                   <div 
