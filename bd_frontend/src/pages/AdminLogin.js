@@ -3,6 +3,7 @@ import { Container, Row, Col, Form, Button, Card, Spinner } from 'react-bootstra
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 
 const AdminLogin = () => {
   const [credentials, setCredentials] = useState({
@@ -11,9 +12,6 @@ const AdminLogin = () => {
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
-  // Using the custom port and routing prefix from your app.js
-  const API_BASE_URL = 'http://localhost:7001/blooddonationbackend';
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,9 +36,7 @@ const AdminLogin = () => {
 
       if (response.status === 200) {
         toast.success('Login Successful! Welcome Admin.');
-        // If you build an Admin Dashboard later, you would navigate there.
-        // For now, redirecting to the main dashboard.
-        navigate('/dashboard'); 
+        navigate('/admin-dashboard');
       }
     } catch (error) {
       console.error('Login Error:', error);
