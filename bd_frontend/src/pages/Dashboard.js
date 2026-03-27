@@ -26,8 +26,9 @@ const Dashboard = () => {
       const registrations = registrationsRes.data || [];
       const events = eventsRes.data || [];
       const volunteers = volunteersRes.data || [];
+      const donatedRegistrations = registrations.filter((registration) => registration.donated);
 
-      const bloodGroupCounts = registrations.reduce((acc, registration) => {
+      const bloodGroupCounts = donatedRegistrations.reduce((acc, registration) => {
         const bloodGroup = registration.bloodgroup || registration.BloodGroup || 'Unknown';
         acc[bloodGroup] = (acc[bloodGroup] || 0) + 1;
         return acc;
@@ -39,11 +40,11 @@ const Dashboard = () => {
       }));
 
       setOverviewData({
-        NumberOfDonors: registrations.length,
-        UnitsCollected: registrations.filter((registration) => registration.donated).length,
+        NumberOfDonors: donatedRegistrations.length,
+        UnitsCollected: donatedRegistrations.length,
         NumberOfBloodCamps: events.length,
         RegisteredCount: registrations.length,
-        StudentsCount: registrations.length,
+        StudentsCount: donatedRegistrations.length,
         StaffCount: 0,
         GuestCount: 0,
         NumberOfVolunteers: volunteers.length,
@@ -76,6 +77,11 @@ const Dashboard = () => {
       fetchDashboardData(); // Refetch data to update charts/cards instantly
     });
 
+    socket.on('donationConfirmed', (data) => {
+      console.log('Donation confirmation received:', data);
+      fetchDashboardData();
+    });
+
     return () => {
       socket.disconnect();
     };
@@ -105,7 +111,7 @@ const Dashboard = () => {
           <Col md={3} sm={6}>
             <Card className="border-0 shadow-sm h-100 text-center py-3 border-bottom border-danger border-4">
               <Card.Body>
-                <h6 className="text-muted text-uppercase fw-bold mb-3">Total Donors</h6>
+                <h6 className="text-muted text-uppercase fw-bold mb-3">Actual Donors</h6>
                 <h2 className="display-5 fw-bold text-dark mb-0">{overviewData?.NumberOfDonors || 0}</h2>
               </Card.Body>
             </Card>
@@ -141,7 +147,7 @@ const Dashboard = () => {
           <Col lg={6}>
             <Card className="border-0 shadow-sm h-100">
               <Card.Header className="bg-white border-0 pt-4 pb-0">
-                <h5 className="fw-bold text-dark">Donor Demographics</h5>
+                <h5 className="fw-bold text-dark">Confirmed Donor Demographics</h5>
               </Card.Header>
               <Card.Body style={{ height: '350px' }}>
                 <ResponsiveContainer width="100%" height="100%">
@@ -167,7 +173,7 @@ const Dashboard = () => {
           <Col lg={6}>
             <Card className="border-0 shadow-sm h-100">
               <Card.Header className="bg-white border-0 pt-4 pb-0">
-                <h5 className="fw-bold text-dark">Blood Group Distribution</h5>
+                <h5 className="fw-bold text-dark">Confirmed Blood Group Distribution</h5>
               </Card.Header>
               <Card.Body style={{ height: '350px' }}>
                 {bloodGroupData.length > 0 ? (
