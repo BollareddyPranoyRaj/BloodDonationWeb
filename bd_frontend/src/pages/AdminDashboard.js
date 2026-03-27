@@ -22,6 +22,16 @@ const AdminDashboard = () => {
   const [galleryImage, setGalleryImage] = useState(null);
   const [galleryLoading, setGalleryLoading] = useState(false);
 
+  // --- Donation Desk State ---
+  const [donationDeskData, setDonationDeskData] = useState({
+    RollNumber: '',
+    PhoneNumber: '',
+    EventDate: new Date().toISOString().split('T')[0],
+  });
+  const [donationLookup, setDonationLookup] = useState(null);
+  const [lookupLoading, setLookupLoading] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+
   // --- Handlers for Event ---
   const handleEventChange = (e) => {
     const { name, value } = e.target;
@@ -101,6 +111,100 @@ const AdminDashboard = () => {
       toast.error('Failed to upload image. Please try again.');
     } finally {
       setGalleryLoading(false);
+    }
+  };
+
+  // --- Donation Desk Handlers ---
+  const handleDonationDeskChange = (e) => {
+    const { name, value } = e.target;
+    setDonationDeskData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const resetDonationDesk = () => {
+    setDonationDeskData({
+      RollNumber: '',
+      PhoneNumber: '',
+      EventDate: new Date().toISOString().split('T')[0],
+    });
+    setDonationLookup(null);
+  };
+
+  const handleDonorLookup = async (e) => {
+    e.preventDefault();
+
+    if (!donationDeskData.RollNumber || !donationDeskData.EventDate) {
+      toast.warning('Enter roll number and event date first.');
+      return;
+    }
+
+    setLookupLoading(true);
+
+    try {
+      const response = await axios.get(`${API_BASE_URL}/registrations/search`, {
+        params: {
+          rollno: donationDeskData.RollNumber,
+          eventDate: donationDeskData.EventDate,
+        },
+      });
+
+      setDonationLookup(response.data);
+
+      if (response.data.donated) {
+        toast.info('This donor is already marked as donated.');
+      } else {
+        toast.success('Registration found. You can confirm donation now.');
+      }
+    } catch (error) {
+      if (error.response?.status === 404) {
+        setDonationLookup({
+          found: false,
+          message: error.response.data?.message,
+        });
+        toast.info('No registration found. You can still confirm and create it here.');
+      } else {
+        console.error('Lookup error:', error);
+        toast.error('Unable to check donor right now.');
+      }
+    } finally {
+      setLookupLoading(false);
+    }
+  };
+
+  const handleConfirmDonation = async (e) => {
+    e.preventDefault();
+
+    if (!donationDeskData.RollNumber || !donationDeskData.EventDate) {
+      toast.warning('Enter roll number and event date first.');
+      return;
+    }
+
+    if (!donationLookup?.found && !donationDeskData.PhoneNumber) {
+      toast.warning('Phone number is required when registering a new donor at the desk.');
+      return;
+    }
+
+    setConfirmLoading(true);
+
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/registrations/confirm-donation`,
+        donationDeskData
+      );
+
+      setDonationLookup({
+        found: true,
+        donated: true,
+        data: response.data.data,
+      });
+      toast.success(response.data.message);
+    } catch (error) {
+      console.error('Confirm donation error:', error);
+      toast.error(error.response?.data?.message || 'Unable to confirm donation.');
+    } finally {
+      setConfirmLoading(false);
     }
   };
 
@@ -236,6 +340,113 @@ const AdminDashboard = () => {
                           {galleryLoading ? 'Uploading...' : 'Add to Gallery'}
                         </Button>
                       </Form>
+                    </div>
+                  </Tab>
+
+                  <Tab eventKey="donation-desk" title="Donation Desk">
+                    <div className="pt-3">
+                      <h5 className="fw-bold mb-2 text-dark">Confirm Completed Donation</h5>
+                      <p className="text-muted mb-4">
+                        Search by roll number. If the donor was already registered outside, just confirm donation.
+                        If not, enter the phone number here and the system will register and confirm in one step.
+                      </p>
+
+                      <Form onSubmit={handleDonorLookup}>
+                        <Row>
+                          <Col md={6}>
+                            <Form.Group className="mb-3">
+                              <Form.Label className="fw-semibold">Roll Number</Form.Label>
+                              <Form.Control
+                                type="text"
+                                name="RollNumber"
+                                placeholder="Enter donor roll number"
+                                value={donationDeskData.RollNumber}
+                                onChange={handleDonationDeskChange}
+                                required
+                              />
+                            </Form.Group>
+                          </Col>
+                          <Col md={6}>
+                            <Form.Group className="mb-3">
+                              <Form.Label className="fw-semibold">Event Date</Form.Label>
+                              <Form.Control
+                                type="date"
+                                name="EventDate"
+                                value={donationDeskData.EventDate}
+                                onChange={handleDonationDeskChange}
+                                required
+                              />
+                            </Form.Group>
+                          </Col>
+                        </Row>
+
+                        <Form.Group className="mb-4">
+                          <Form.Label className="fw-semibold">Phone Number</Form.Label>
+                          <Form.Control
+                            type="tel"
+                            name="PhoneNumber"
+                            placeholder="Only needed if the donor was not registered outside"
+                            value={donationDeskData.PhoneNumber}
+                            onChange={handleDonationDeskChange}
+                          />
+                          <Form.Text className="text-muted">
+                            Leave this empty if the donor is already registered.
+                          </Form.Text>
+                        </Form.Group>
+
+                        <div className="d-flex flex-wrap gap-2 mb-4">
+                          <Button
+                            variant="outline-dark"
+                            type="submit"
+                            disabled={lookupLoading}
+                          >
+                            {lookupLoading ? <Spinner size="sm" animation="border" className="me-2" /> : null}
+                            {lookupLoading ? 'Checking...' : 'Check Donor'}
+                          </Button>
+
+                          <Button
+                            variant="danger"
+                            type="button"
+                            disabled={confirmLoading}
+                            onClick={handleConfirmDonation}
+                          >
+                            {confirmLoading ? <Spinner size="sm" animation="border" className="me-2" /> : null}
+                            {confirmLoading ? 'Confirming...' : 'Mark as Donated'}
+                          </Button>
+
+                          <Button
+                            variant="light"
+                            type="button"
+                            className="border"
+                            onClick={resetDonationDesk}
+                          >
+                            Reset
+                          </Button>
+                        </div>
+                      </Form>
+
+                      {donationLookup ? (
+                        <Card className="border-0 bg-light">
+                          <Card.Body>
+                            <h6 className="fw-bold mb-3">Desk Result</h6>
+                            {donationLookup.found ? (
+                              <>
+                                <p className="mb-2"><strong>Name:</strong> {donationLookup.data?.studentname || 'N/A'}</p>
+                                <p className="mb-2"><strong>Roll Number:</strong> {donationLookup.data?.rollno || donationDeskData.RollNumber}</p>
+                                <p className="mb-2"><strong>College:</strong> {donationLookup.data?.college || 'N/A'}</p>
+                                <p className="mb-0">
+                                  <strong>Status:</strong>{' '}
+                                  {donationLookup.donated ? 'Donation already confirmed' : 'Registered, waiting for donation confirmation'}
+                                </p>
+                              </>
+                            ) : (
+                              <p className="mb-0 text-muted">
+                                {donationLookup.message || 'No donor found for this event date. You can confirm and create the donor from this desk.'}
+                              </p>
+                            )}
+                          </Card.Body>
+                        </Card>
+                      ) : null}
                     </div>
                   </Tab>
                 </Tabs>
