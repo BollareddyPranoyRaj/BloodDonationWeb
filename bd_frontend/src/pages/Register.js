@@ -3,6 +3,7 @@ import { Container, Row, Col, Form, Button, Card } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../config/api';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -12,9 +13,6 @@ const Register = () => {
     EventDate: ''
   });
   const [loading, setLoading] = useState(false);
-
-  // Use your backend URL port here based on your app.js (7001)
-  const API_BASE_URL = 'http://localhost:7001/blooddonationbackend'; 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -40,7 +38,13 @@ const Register = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/register`, formData);
+      const payload = {
+        RollNumber: formData.RollNumber,
+        PhoneNumber: formData.PhoneNumber,
+        EventDate: formData.EventDate,
+      };
+
+      const response = await axios.post(`${API_BASE_URL}/register`, payload);
       
       if (response.status === 200 || response.status === 201) {
         if (response.data.message === 'Student already exists' || response.data === 'Student is already registered for this event date') {
