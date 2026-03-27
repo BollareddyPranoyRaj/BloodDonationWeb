@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Badge, Spinner } from 'react-bootstrap';
 import axios from 'axios';
+import { API_BASE_URL, SERVER_BASE_URL } from '../config/api';
 
 const EventsPage = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Using the custom port and routing prefix from your app.js
-  const API_BASE_URL = 'http://localhost:7001/blooddonationbackend';
-
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/get-events`);
+        const response = await axios.get(`${API_BASE_URL}/events`);
         setEvents(response.data);
       } catch (error) {
         console.error('Error fetching events:', error);
@@ -69,9 +67,9 @@ const EventsPage = () => {
                   {/* Event Image */}
                   <div style={{ height: '200px', overflow: 'hidden', backgroundColor: '#f8f9fa' }}>
                     {event.filename ? (
-                      <Card.Img 
+                      <Card.Img
                         variant="top" 
-                        src={`${API_BASE_URL}/Events/${event.filename}`} 
+                        src={`${SERVER_BASE_URL}/Events/${event.filename}`} 
                         alt={event.EventName}
                         style={{ objectFit: 'cover', height: '100%', width: '100%' }}
                         onError={(e) => {
@@ -102,7 +100,7 @@ const EventsPage = () => {
                         {event.Colleges && event.Colleges.length > 0 ? (
                           event.Colleges.map((college, idx) => (
                             <Badge bg="light" text="dark" className="border" key={idx}>
-                              {college}
+                              {typeof college === 'string' ? college : college.name}
                             </Badge>
                           ))
                         ) : (
