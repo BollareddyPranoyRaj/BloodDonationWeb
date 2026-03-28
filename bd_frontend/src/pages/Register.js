@@ -1,21 +1,92 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Form, Button, Card } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../config/api';
+import { clearStoredSelectedEvent, getStoredSelectedEvent, storeSelectedEvent } from '../utils/selectedEvent';
 
 const Register = () => {
   const navigate = useNavigate();
+  const [events, setEvents] = useState([]);
+  const [eventsLoading, setEventsLoading] = useState(true);
+  const [selectedEventId, setSelectedEventId] = useState(() => getStoredSelectedEvent()?._id || '');
   const [formData, setFormData] = useState({
     RollNumber: '',
     PhoneNumber: '',
-    EventDate: ''
+    EventDate: getStoredSelectedEvent()?.EventDate || '',
+    SelectedEventId: getStoredSelectedEvent()?._id || '',
+    SelectedEventName: getStoredSelectedEvent()?.EventName || '',
   });
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/events`);
+        const eventList = response.data || [];
+        setEvents(eventList);
+
+        const storedSelection = getStoredSelectedEvent();
+        if (storedSelection?._id) {
+          const matchingEvent = eventList.find((event) => event._id === storedSelection._id);
+          if (matchingEvent) {
+            setSelectedEventId(matchingEvent._id);
+            setFormData((prev) => ({
+              ...prev,
+              EventDate: new Date(matchingEvent.Date).toISOString().split('T')[0],
+              SelectedEventId: matchingEvent._id,
+              SelectedEventName: matchingEvent.EventName,
+            }));
+          } else {
+            clearStoredSelectedEvent();
+            setSelectedEventId('');
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching events for registration:', error);
+      } finally {
+        setEventsLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === 'SelectedEvent') {
+      const selectedEvent = events.find((event) => event._id === value);
+      setSelectedEventId(value);
+
+      if (selectedEvent) {
+        const eventSelection = {
+          _id: selectedEvent._id,
+          EventName: selectedEvent.EventName,
+          EventDate: new Date(selectedEvent.Date).toISOString().split('T')[0],
+        };
+
+        storeSelectedEvent(eventSelection);
+        setFormData({
+          ...formData,
+          EventDate: eventSelection.EventDate,
+          SelectedEventId: eventSelection._id,
+          SelectedEventName: eventSelection.EventName,
+        });
+      } else {
+        clearStoredSelectedEvent();
+        setFormData({
+          ...formData,
+          EventDate: '',
+          SelectedEventId: '',
+          SelectedEventName: '',
+        });
+      }
+
+      return;
+    }
+
     setFormData({
       ...formData,
       [name]: value
@@ -42,6 +113,8 @@ const Register = () => {
         RollNumber: formData.RollNumber,
         PhoneNumber: formData.PhoneNumber,
         EventDate: formData.EventDate,
+        SelectedEventId: formData.SelectedEventId,
+        SelectedEventName: formData.SelectedEventName,
       };
 
       const response = await axios.post(`${API_BASE_URL}/register`, payload);
@@ -55,7 +128,9 @@ const Register = () => {
           setFormData({
             RollNumber: '',
             PhoneNumber: '',
-            EventDate: ''
+            EventDate: getStoredSelectedEvent()?.EventDate || '',
+            SelectedEventId: getStoredSelectedEvent()?._id || '',
+            SelectedEventName: getStoredSelectedEvent()?.EventName || '',
           });
           setTimeout(() => navigate('/'), 2000);
         }
@@ -107,6 +182,22 @@ const Register = () => {
                 </Form.Group>
 
                 <Form.Group className="mb-5" controlId="formEventDate">
+                  <Form.Label className="fw-semibold">Select Event</Form.Label>
+                  <Form.Select
+                    name="SelectedEvent"
+                    value={selectedEventId}
+                    onChange={handleChange}
+                    className="py-2 mb-3"
+                    disabled={eventsLoading}
+                  >
+                    <option value="">Choose an event</option>
+                    {events.map((event) => (
+                      <option key={event._id} value={event._id}>
+                        {event.EventName} - {new Date(event.Date).toLocaleDateString()}
+                      </option>
+                    ))}
+                  </Form.Select>
+
                   <Form.Label className="fw-semibold">Select Event Date</Form.Label>
                   <Form.Control 
                     type="date" 
@@ -116,6 +207,9 @@ const Register = () => {
                     className="py-2"
                     required
                   />
+                  <Form.Text className="text-muted">
+                    The selected event stays as the default for the next registration until you change it.
+                  </Form.Text>
                 </Form.Group>
 
                 <div className="d-grid gap-2">

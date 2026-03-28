@@ -110,3 +110,110 @@ code {
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   border: none !important;
 }
+
+.event-select-card {
+  border: 2px solid transparent;
+}
+
+.event-select-card--selected {
+  border-color: #dc3545;
+  transform: translateY(-6px);
+  box-shadow: 0 16px 30px rgba(220, 53, 69, 0.18) !important;
+}
+
+.event-selected-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.28);
+  backdrop-filter: blur(5px);
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.dashboard-donut-card {
+  background:
+    radial-gradient(circle at top right, rgba(37, 99, 235, 0.08), transparent 35%),
+    #fff;
+}
+
+.dashboard-event-tooltip {
+  min-width: 220px;
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.12);
+}
+
+.dashboard-event-tooltip p {
+  margin: 0;
+  color: #334155;
+  line-height: 1.6;
+}
+
+.dashboard-donut-body {
+  min-height: 350px;
+}
+
+.dashboard-donut-layout {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.dashboard-donut-chart-wrap {
+  position: relative;
+  min-height: 320px;
+  width: min(100%, 420px);
+  min-width: 0;
+}
+
+.dashboard-donut-center {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.dashboard-donut-center.is-dimmed {
+  opacity: 0.12;
+  transform: translate(-50%, -50%) scale(0.96);
+}
+
+.dashboard-donut-center-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.dashboard-donut-center-value {
+  font-size: 2.4rem;
+  line-height: 1;
+  color: #0f172a;
+}
+
+.dashboard-donut-center-foot {
+  font-size: 0.82rem;
+  color: #64748b;
+}
+
+@media (max-width: 991px) {
+  .dashboard-donut-chart-wrap {
+    min-height: 300px;
+  }
+}

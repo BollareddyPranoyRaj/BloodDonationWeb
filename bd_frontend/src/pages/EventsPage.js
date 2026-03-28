@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Badge, Spinner } from 'react-bootstrap';
+import { Container, Row, Col, Card, Badge, Spinner, Button } from 'react-bootstrap';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL, SERVER_BASE_URL } from '../config/api';
+import { getStoredSelectedEvent, storeSelectedEvent } from '../utils/selectedEvent';
 
 const EventsPage = () => {
+  const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedEventId, setSelectedEventId] = useState(() => getStoredSelectedEvent()?._id || '');
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -28,13 +32,33 @@ const EventsPage = () => {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
-  // Determine if an event is upcoming or past
-  const isUpcoming = (dateString) => {
+  // Determine whether an event is upcoming, today, or completed
+  const getEventStatus = (dateString) => {
     const eventDate = new Date(dateString);
     eventDate.setHours(0, 0, 0, 0);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    return eventDate >= today;
+
+    if (eventDate.getTime() === today.getTime()) {
+      return { label: 'Today', badge: 'warning' };
+    }
+
+    if (eventDate > today) {
+      return { label: 'Upcoming', badge: 'success' };
+    }
+
+    return { label: 'Completed', badge: 'secondary' };
+  };
+
+  const handleSelectEvent = (event) => {
+    const selectedEvent = {
+      _id: event._id,
+      EventName: event.EventName,
+      EventDate: new Date(event.Date).toISOString().split('T')[0],
+    };
+
+    setSelectedEventId(event._id);
+    storeSelectedEvent(selectedEvent);
   };
 
   return (
@@ -61,11 +85,15 @@ const EventsPage = () => {
           </div>
         ) : (
           <Row className="g-4">
-            {events.map((event) => (
+            {events.map((event) => {
+              const status = getEventStatus(event.Date);
+              const isSelected = selectedEventId === event._id;
+
+              return (
               <Col md={6} lg={4} key={event._id}>
-                <Card className="h-100 border-0 shadow-sm hover-effect overflow-hidden rounded-3">
+                <Card className={`h-100 border-0 shadow-sm hover-effect overflow-hidden rounded-3 event-select-card ${isSelected ? 'event-select-card--selected' : ''}`}>
                   {/* Event Image */}
-                  <div style={{ height: '200px', overflow: 'hidden', backgroundColor: '#f8f9fa' }}>
+                  <div className="position-relative" style={{ height: '200px', overflow: 'hidden', backgroundColor: '#f8f9fa' }}>
                     {event.filename ? (
                       <Card.Img
                         variant="top" 
@@ -82,12 +110,18 @@ const EventsPage = () => {
                         No Image Available
                       </div>
                     )}
+
+                    {isSelected ? (
+                      <div className="event-selected-overlay">
+                        Selected
+                      </div>
+                    ) : null}
                   </div>
                   
                   <Card.Body className="d-flex flex-column p-4">
                     <div className="d-flex justify-content-between align-items-start mb-2">
-                      <Badge bg={isUpcoming(event.Date) ? "success" : "secondary"} className="mb-2 px-3 py-2 rounded-pill">
-                        {isUpcoming(event.Date) ? "Upcoming" : "Completed"}
+                      <Badge bg={status.badge} className="mb-2 px-3 py-2 rounded-pill">
+                        {status.label}
                       </Badge>
                       <small className="text-danger fw-bold">{formatDate(event.Date)}</small>
                     </div>
@@ -107,11 +141,31 @@ const EventsPage = () => {
                           <span className="text-muted small">Venues to be announced</span>
                         )}
                       </div>
+
+                      <div className="d-flex gap-2 mt-4">
+                        <Button
+                          variant={isSelected ? 'danger' : 'outline-danger'}
+                          className="rounded-pill px-4 fw-semibold"
+                          onClick={() => handleSelectEvent(event)}
+                        >
+                          {isSelected ? 'Selected' : 'Select Event'}
+                        </Button>
+                        <Button
+                          variant="light"
+                          className="rounded-pill px-4 border"
+                          onClick={() => {
+                            handleSelectEvent(event);
+                            navigate('/register');
+                          }}
+                        >
+                          Register Here
+                        </Button>
+                      </div>
                     </div>
                   </Card.Body>
                 </Card>
               </Col>
-            ))}
+            )})}
           </Row>
         )}
       </Container>
