@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Form, Button, Tabs, Tab, Spinner, Badge } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import axios from 'axios';
@@ -8,6 +8,7 @@ import { API_BASE_URL } from '../config/api';
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('events');
+  const [eventOptions, setEventOptions] = useState([]);
 
   // --- Event Upload State ---
   const [eventData, setEventData] = useState({
@@ -27,10 +28,44 @@ const AdminDashboard = () => {
     RollNumber: '',
     PhoneNumber: '',
     EventDate: new Date().toISOString().split('T')[0],
+    SelectedEventId: '',
+    SelectedEventName: '',
   });
   const [donationLookup, setDonationLookup] = useState(null);
   const [lookupLoading, setLookupLoading] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const [staffData, setStaffData] = useState({
+    StaffName: '',
+    StaffId: '',
+    CollegeName: '',
+    MobileNumber: '',
+    EventDate: new Date().toISOString().split('T')[0],
+    Venue: '',
+    BloodGroup: '',
+  });
+  const [guestManagementData, setGuestManagementData] = useState({
+    Name: '',
+    TypeOfDonor: 'Guest',
+    MobileNumber: '',
+    EventDate: new Date().toISOString().split('T')[0],
+    Venue: '',
+    BloodGroup: '',
+  });
+  const [staffLoading, setStaffLoading] = useState(false);
+  const [guestManagementLoading, setGuestManagementLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/events`);
+        setEventOptions(response.data || []);
+      } catch (error) {
+        console.error('Error fetching event options:', error);
+      }
+    };
+
+    fetchEvents();
+  }, []);
 
   // --- Handlers for Event ---
   const handleEventChange = (e) => {
@@ -128,6 +163,8 @@ const AdminDashboard = () => {
       RollNumber: '',
       PhoneNumber: '',
       EventDate: new Date().toISOString().split('T')[0],
+      SelectedEventId: '',
+      SelectedEventName: '',
     });
     setDonationLookup(null);
   };
@@ -151,6 +188,11 @@ const AdminDashboard = () => {
       });
 
       setDonationLookup(response.data);
+      setDonationDeskData((prev) => ({
+        ...prev,
+        SelectedEventId: response.data.data?.SelectedEventId || prev.SelectedEventId,
+        SelectedEventName: response.data.data?.SelectedEventName || prev.SelectedEventName,
+      }));
 
       if (response.data.donated) {
         toast.info('This donor is already marked as donated.');
@@ -199,12 +241,112 @@ const AdminDashboard = () => {
         donated: true,
         data: response.data.data,
       });
+      setDonationDeskData((prev) => ({
+        ...prev,
+        SelectedEventId: response.data.data?.SelectedEventId || prev.SelectedEventId,
+        SelectedEventName: response.data.data?.SelectedEventName || prev.SelectedEventName,
+      }));
       toast.success(response.data.message);
     } catch (error) {
       console.error('Confirm donation error:', error);
       toast.error(error.response?.data?.message || 'Unable to confirm donation.');
     } finally {
       setConfirmLoading(false);
+    }
+  };
+
+  const handleStaffChange = (e) => {
+    const { name, value } = e.target;
+    if (name === 'Venue') {
+      const selectedEvent = eventOptions.find((event) => event.EventName === value);
+      setStaffData((prev) => ({
+        ...prev,
+        Venue: value,
+        EventDate: selectedEvent?.Date
+          ? new Date(selectedEvent.Date).toISOString().split('T')[0]
+          : prev.EventDate,
+      }));
+      return;
+    }
+
+    setStaffData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const resetStaffForm = () => {
+    setStaffData({
+      StaffName: '',
+      StaffId: '',
+      CollegeName: '',
+      MobileNumber: '',
+      EventDate: new Date().toISOString().split('T')[0],
+      Venue: '',
+      BloodGroup: '',
+    });
+  };
+
+  const handleStaffSubmit = async (e) => {
+    e.preventDefault();
+    setStaffLoading(true);
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/add-staff`, staffData);
+      toast.success(response.data.message || 'Staff donor added successfully.');
+      resetStaffForm();
+    } catch (error) {
+      console.error('Error adding staff donor:', error);
+      toast.error(error.response?.data?.message || 'Failed to add staff donor.');
+    } finally {
+      setStaffLoading(false);
+    }
+  };
+
+  const handleGuestManagementChange = (e) => {
+    const { name, value } = e.target;
+    if (name === 'Venue') {
+      const selectedEvent = eventOptions.find((event) => event.EventName === value);
+      setGuestManagementData((prev) => ({
+        ...prev,
+        Venue: value,
+        EventDate: selectedEvent?.Date
+          ? new Date(selectedEvent.Date).toISOString().split('T')[0]
+          : prev.EventDate,
+      }));
+      return;
+    }
+
+    setGuestManagementData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const resetGuestManagementForm = () => {
+    setGuestManagementData({
+      Name: '',
+      TypeOfDonor: 'Guest',
+      MobileNumber: '',
+      EventDate: new Date().toISOString().split('T')[0],
+      Venue: '',
+      BloodGroup: '',
+    });
+  };
+
+  const handleGuestManagementSubmit = async (e) => {
+    e.preventDefault();
+    setGuestManagementLoading(true);
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/add-guest-management`, guestManagementData);
+      toast.success(response.data.message || 'Guest/Management donor added successfully.');
+      resetGuestManagementForm();
+    } catch (error) {
+      console.error('Error adding guest/management donor:', error);
+      toast.error(error.response?.data?.message || 'Failed to add guest/management donor.');
+    } finally {
+      setGuestManagementLoading(false);
     }
   };
 
@@ -447,6 +589,230 @@ const AdminDashboard = () => {
                           </Card.Body>
                         </Card>
                       ) : null}
+                    </div>
+                  </Tab>
+
+                  <Tab eventKey="manual-donor-entry" title="Manual Donor Entry">
+                    <div className="pt-3">
+                      <h5 className="fw-bold mb-2 text-dark">Add Staff and Guest/Management Donors</h5>
+                      <p className="text-muted mb-4">
+                        Use this tab for donors who are not part of the student registration flow. These entries feed the demographics bars on the live dashboard.
+                      </p>
+
+                      <Row className="g-4">
+                        <Col md={6}>
+                          <Card className="border-0 bg-light h-100">
+                            <Card.Body>
+                              <h6 className="fw-bold mb-3">Staff Donor</h6>
+                              <Form onSubmit={handleStaffSubmit}>
+                                <Form.Group className="mb-3">
+                                  <Form.Label className="fw-semibold">Staff Name</Form.Label>
+                                  <Form.Control
+                                    type="text"
+                                    name="StaffName"
+                                    value={staffData.StaffName}
+                                    onChange={handleStaffChange}
+                                    required
+                                  />
+                                </Form.Group>
+
+                                <Form.Group className="mb-3">
+                                  <Form.Label className="fw-semibold">Staff ID</Form.Label>
+                                  <Form.Control
+                                    type="text"
+                                    name="StaffId"
+                                    value={staffData.StaffId}
+                                    onChange={handleStaffChange}
+                                    required
+                                  />
+                                </Form.Group>
+
+                                <Form.Group className="mb-3">
+                                  <Form.Label className="fw-semibold">College / Organization</Form.Label>
+                                  <Form.Control
+                                    type="text"
+                                    name="CollegeName"
+                                    value={staffData.CollegeName}
+                                    onChange={handleStaffChange}
+                                    required
+                                  />
+                                </Form.Group>
+
+                                <Form.Group className="mb-3">
+                                  <Form.Label className="fw-semibold">Mobile Number</Form.Label>
+                                  <Form.Control
+                                    type="tel"
+                                    name="MobileNumber"
+                                    value={staffData.MobileNumber}
+                                    onChange={handleStaffChange}
+                                    required
+                                  />
+                                </Form.Group>
+
+                                <Row>
+                                  <Col sm={6}>
+                                    <Form.Group className="mb-3">
+                                      <Form.Label className="fw-semibold">Event Date</Form.Label>
+                                    <Form.Control
+                                        type="date"
+                                        name="EventDate"
+                                        value={staffData.EventDate}
+                                        required
+                                        readOnly
+                                        disabled
+                                      />
+                                      <Form.Text className="text-muted">
+                                        Auto-filled from the selected event.
+                                      </Form.Text>
+                                    </Form.Group>
+                                  </Col>
+                                  <Col sm={6}>
+                                    <Form.Group className="mb-3">
+                                      <Form.Label className="fw-semibold">Blood Group</Form.Label>
+                                      <Form.Control
+                                        type="text"
+                                        name="BloodGroup"
+                                        placeholder="Optional"
+                                        value={staffData.BloodGroup}
+                                        onChange={handleStaffChange}
+                                      />
+                                    </Form.Group>
+                                  </Col>
+                                </Row>
+
+                                <Form.Group className="mb-4">
+                                  <Form.Label className="fw-semibold">Venue / Event Name</Form.Label>
+                                  <Form.Select
+                                    name="Venue"
+                                    value={staffData.Venue}
+                                    onChange={handleStaffChange}
+                                    required
+                                  >
+                                    <option value="">Select an event</option>
+                                    {eventOptions.map((event) => (
+                                      <option key={event._id} value={event.EventName}>
+                                        {event.EventName} ({new Date(event.Date).toLocaleDateString()})
+                                      </option>
+                                    ))}
+                                  </Form.Select>
+                                </Form.Group>
+
+                                <div className="d-flex flex-wrap gap-2">
+                                  <Button variant="danger" type="submit" disabled={staffLoading}>
+                                    {staffLoading ? <Spinner size="sm" animation="border" className="me-2" /> : null}
+                                    {staffLoading ? 'Saving...' : 'Add Staff Donor'}
+                                  </Button>
+                                  <Button variant="light" type="button" className="border" onClick={resetStaffForm}>
+                                    Reset
+                                  </Button>
+                                </div>
+                              </Form>
+                            </Card.Body>
+                          </Card>
+                        </Col>
+
+                        <Col md={6}>
+                          <Card className="border-0 bg-light h-100">
+                            <Card.Body>
+                              <h6 className="fw-bold mb-3">Guest / Management Donor</h6>
+                              <Form onSubmit={handleGuestManagementSubmit}>
+                                <Form.Group className="mb-3">
+                                  <Form.Label className="fw-semibold">Donor Name</Form.Label>
+                                  <Form.Control
+                                    type="text"
+                                    name="Name"
+                                    value={guestManagementData.Name}
+                                    onChange={handleGuestManagementChange}
+                                    required
+                                  />
+                                </Form.Group>
+
+                                <Form.Group className="mb-3">
+                                  <Form.Label className="fw-semibold">Donor Type</Form.Label>
+                                  <Form.Select
+                                    name="TypeOfDonor"
+                                    value={guestManagementData.TypeOfDonor}
+                                    onChange={handleGuestManagementChange}
+                                    required
+                                  >
+                                    <option value="Guest">Guest</option>
+                                    <option value="Management">Management</option>
+                                  </Form.Select>
+                                </Form.Group>
+
+                                <Form.Group className="mb-3">
+                                  <Form.Label className="fw-semibold">Mobile Number</Form.Label>
+                                  <Form.Control
+                                    type="tel"
+                                    name="MobileNumber"
+                                    value={guestManagementData.MobileNumber}
+                                    onChange={handleGuestManagementChange}
+                                    required
+                                  />
+                                </Form.Group>
+
+                                <Row>
+                                  <Col sm={6}>
+                                    <Form.Group className="mb-3">
+                                      <Form.Label className="fw-semibold">Event Date</Form.Label>
+                                    <Form.Control
+                                        type="date"
+                                        name="EventDate"
+                                        value={guestManagementData.EventDate}
+                                        required
+                                        readOnly
+                                        disabled
+                                      />
+                                      <Form.Text className="text-muted">
+                                        Auto-filled from the selected event.
+                                      </Form.Text>
+                                    </Form.Group>
+                                  </Col>
+                                  <Col sm={6}>
+                                    <Form.Group className="mb-3">
+                                      <Form.Label className="fw-semibold">Blood Group</Form.Label>
+                                      <Form.Control
+                                        type="text"
+                                        name="BloodGroup"
+                                        placeholder="Optional"
+                                        value={guestManagementData.BloodGroup}
+                                        onChange={handleGuestManagementChange}
+                                      />
+                                    </Form.Group>
+                                  </Col>
+                                </Row>
+
+                                <Form.Group className="mb-4">
+                                  <Form.Label className="fw-semibold">Venue / Event Name</Form.Label>
+                                  <Form.Select
+                                    name="Venue"
+                                    value={guestManagementData.Venue}
+                                    onChange={handleGuestManagementChange}
+                                    required
+                                  >
+                                    <option value="">Select an event</option>
+                                    {eventOptions.map((event) => (
+                                      <option key={event._id} value={event.EventName}>
+                                        {event.EventName} ({new Date(event.Date).toLocaleDateString()})
+                                      </option>
+                                    ))}
+                                  </Form.Select>
+                                </Form.Group>
+
+                                <div className="d-flex flex-wrap gap-2">
+                                  <Button variant="danger" type="submit" disabled={guestManagementLoading}>
+                                    {guestManagementLoading ? <Spinner size="sm" animation="border" className="me-2" /> : null}
+                                    {guestManagementLoading ? 'Saving...' : 'Add Guest / Management'}
+                                  </Button>
+                                  <Button variant="light" type="button" className="border" onClick={resetGuestManagementForm}>
+                                    Reset
+                                  </Button>
+                                </div>
+                              </Form>
+                            </Card.Body>
+                          </Card>
+                        </Col>
+                      </Row>
                     </div>
                   </Tab>
                 </Tabs>
