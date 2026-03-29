@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Container, Row, Col, Card, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 import { io } from 'socket.io-client';
@@ -35,24 +35,24 @@ const Dashboard = () => {
   const HOVER_COLOR = '#2563eb';
   const totalConfirmedDonations = eventDistributionData.reduce((sum, event) => sum + event.value, 0);
 
-  const getEventNameFromDate = (eventDateValue, events) => {
-    if (!eventDateValue) {
-      return null;
-    }
+  const fetchDashboardData = useCallback(async () => {
+    const getEventNameFromDate = (eventDateValue, events) => {
+      if (!eventDateValue) {
+        return null;
+      }
 
-    const donorDate = new Date(eventDateValue);
-    donorDate.setHours(0, 0, 0, 0);
+      const donorDate = new Date(eventDateValue);
+      donorDate.setHours(0, 0, 0, 0);
 
-    const matchedEvent = events.find((event) => {
-      const eventDate = new Date(event.Date);
-      eventDate.setHours(0, 0, 0, 0);
-      return eventDate.getTime() === donorDate.getTime();
-    });
+      const matchedEvent = events.find((event) => {
+        const eventDate = new Date(event.Date);
+        eventDate.setHours(0, 0, 0, 0);
+        return eventDate.getTime() === donorDate.getTime();
+      });
 
-    return matchedEvent?.EventName || `Event ${donorDate.toLocaleDateString()}`;
-  };
+      return matchedEvent?.EventName || `Event ${donorDate.toLocaleDateString()}`;
+    };
 
-  const fetchDashboardData = async () => {
     try {
       const [registrationsRes, eventsRes, volunteersRes, staffRes, guestManagementRes] = await Promise.all([
         axios.get(`${API_BASE_URL}/registrations`),
@@ -128,7 +128,7 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     // Initial fetch
@@ -157,7 +157,7 @@ const Dashboard = () => {
     return () => {
       socket.disconnect();
     };
-  }, []);
+  }, [fetchDashboardData]);
 
   if (loading) {
     return (
