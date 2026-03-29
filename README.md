@@ -1,33 +1,60 @@
 # Blood Donation Web
 
-A full-stack blood donation management platform built for Aditya University. The project supports donor registration, event management, manual donor entry for staff and guest/management donors, donation confirmation, gallery management, and a live dashboard for tracking impact.
+Full-stack blood donation management platform built for Aditya University. The application supports event-based donor registration, admin-side camp management, donation confirmation, manual donor entry for staff and guest/management donors, gallery management, and a live dashboard for tracking donation activity.
 
-## Features
+## Highlights
 
-- Public donor registration flow
-- Event listing and event-based registration selection
-- Admin login and admin workspace
-- Blood camp creation with image upload
-- Gallery image upload and display
-- Donation desk flow to confirm completed donations
-- Manual donor entry for staff and guest/management donors
-- Live dashboard with donor demographics and event-wise donation analytics
+- Event-based donor registration flow
+- Admin workspace for camp and gallery management
+- Donation desk flow for confirming completed donations
+- Manual donor entry for non-student donors
+- Live dashboard with donor demographics and event-wise analytics
+- Real-time dashboard refresh using Socket.IO
 
 ## Tech Stack
 
-- Frontend: React, React Router, React Bootstrap, Axios, Recharts, Socket.IO Client
-- Backend: Node.js, Express, Mongoose, Socket.IO, Multer
-- Database: MongoDB
+| Layer | Technologies |
+| --- | --- |
+| Frontend | React, React Router, React Bootstrap, Axios, Recharts, Socket.IO Client |
+| Backend | Node.js, Express, Mongoose, Multer, Socket.IO |
+| Database | MongoDB |
+
+## Features
+
+### Public User Features
+
+- Browse available blood donation events
+- Select an event before registration
+- Register as a donor with roll number, phone number, and event date
+- View gallery images from blood donation camps
+
+### Admin Features
+
+- Admin login
+- Create blood donation events with banner/image upload
+- Upload images to the gallery
+- Confirm student donations through the donation desk
+- Add staff donors manually
+- Add guest/management donors manually
+
+### Dashboard Features
+
+- Actual donor count
+- Units collected
+- Number of camps organized
+- Total registrations
+- Confirmed donor demographics
+- Confirmed donations by event
 
 ## Project Structure
 
 ```text
 BloodDonationWeb/
-├── bd_backend/   # Express + MongoDB backend
-└── bd_frontend/  # React frontend
+├── bd_backend/     # Express backend and MongoDB integration
+└── bd_frontend/    # React frontend
 ```
 
-## Setup
+## Local Setup
 
 ### 1. Clone the repository
 
@@ -52,7 +79,7 @@ cd ../bd_frontend
 npm install
 ```
 
-### 3. Configure backend environment
+### 3. Configure environment
 
 Create a `.env` file inside `bd_backend/`:
 
@@ -60,22 +87,22 @@ Create a `.env` file inside `bd_backend/`:
 MONGODB_URI=mongodb://127.0.0.1:27017/blood_donation_db
 ```
 
-If you use a different MongoDB connection string, replace it here.
+You can replace the value above with any local or remote MongoDB connection string.
 
-### 4. Run the backend
+### 4. Start the backend
 
 ```bash
 cd bd_backend
 npm run dev
 ```
 
-Backend runs on:
+Backend URL:
 
 ```text
 http://localhost:5001
 ```
 
-### 5. Run the frontend
+### 5. Start the frontend
 
 Open a new terminal:
 
@@ -84,7 +111,7 @@ cd bd_frontend
 npm start
 ```
 
-Frontend runs on:
+Frontend URL:
 
 ```text
 http://localhost:3000
@@ -92,54 +119,72 @@ http://localhost:3000
 
 ## Available Scripts
 
-Frontend:
+### Frontend
 
 ```bash
 npm start
 npm run build
 ```
 
-Backend:
+### Backend
 
 ```bash
 npm start
 npm run dev
 ```
 
-## Main Workflows
+## Core Flow
 
 ### Donor Registration
 
-- Users can select a blood donation event
-- Users register using roll number, phone number, and event date
-- Registration is stored in MongoDB
+1. User opens the events page
+2. User selects an event
+3. User completes donor registration
+4. Registration is stored in MongoDB
 
-### Admin Operations
+### Donation Confirmation
 
-- Create blood donation events
-- Upload gallery images
-- Confirm completed student donations from the donation desk
-- Add staff donors manually
-- Add guest/management donors manually
+1. Admin opens the donation desk
+2. Admin searches donor registration by roll number and event date
+3. Admin confirms donation
+4. Dashboard updates live
 
-### Live Dashboard
+### Manual Donor Entry
 
-- Shows actual donors, units collected, camps organized, and registrations
-- Displays donor demographics by category
-- Displays confirmed donations by event
+1. Admin selects an existing event
+2. Admin adds staff or guest/management donor details
+3. Dashboard updates demographics and event totals
+
+## API Overview
+
+Some of the main backend routes include:
+
+- `GET /api/events`
+- `POST /api/create-event`
+- `GET /api/registrations`
+- `POST /api/register`
+- `POST /api/registrations/confirm-donation`
+- `POST /api/add-staff`
+- `GET /api/staff`
+- `POST /api/add-guest-management`
+- `GET /api/guest-management`
+- `POST /api/upload-gallery`
+- `GET /api/gallery`
 
 ## Notes
 
-- The project requires MongoDB to be running locally unless you configure a remote `MONGODB_URI`
-- Uploaded event and gallery images are stored by the backend
-- Build output for the frontend is generated inside `bd_frontend/build`
+- MongoDB must be running before starting the backend unless you use a hosted database connection
+- Event and gallery images are handled by the backend
+- The frontend production build is generated in `bd_frontend/build`
+- This project is intended as a full-stack academic/project portfolio application
 
 ## Future Improvements
 
-- README screenshots or demo GIF
-- Deployment instructions
-- Admin-side donor list/export
-- More validation and error handling
+- Add deployment instructions
+- Add screenshots or a short demo GIF
+- Add donor export/reporting
+- Improve validation and error messages
+- Add automated tests
 
 ## Author
 
