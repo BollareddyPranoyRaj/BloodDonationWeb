@@ -1,10 +1,10 @@
 # Blood Donation Web
 
-Full-stack blood donation management platform built for Aditya University. The application supports event-based donor registration, admin-side camp management, donation confirmation, manual donor entry for staff and guest/management donors, gallery management, and a live dashboard for tracking donation activity.
+Full-stack blood donation management platform built for Aditya University. The application supports camp-based donor registration, admin-side camp management, donation confirmation, manual donor entry for staff and guest/management donors, gallery management, and a live dashboard for tracking donation activity.
 
 ## Highlights
 
-- Event-based donor registration flow
+- Camp-based donor registration flow
 - Admin workspace for camp and gallery management
 - Donation desk flow for confirming completed donations
 - Manual donor entry for non-student donors
@@ -23,15 +23,15 @@ Full-stack blood donation management platform built for Aditya University. The a
 
 ### Public User Features
 
-- Browse available blood donation events
-- Select an event before registration
-- Register as a donor with roll number, phone number, and event date
+- Browse available blood donation camps
+- Select a camp before registration
+- Register as a donor with roll number, phone number, and camp date
 - View gallery images from blood donation camps
 
 ### Admin Features
 
 - Admin login
-- Create blood donation events with banner/image upload
+- Create blood donation camps with banner/image upload
 - Upload images to the gallery
 - Confirm student donations through the donation desk
 - Add staff donors manually
@@ -44,7 +44,37 @@ Full-stack blood donation management platform built for Aditya University. The a
 - Number of camps organized
 - Total registrations
 - Confirmed donor demographics
-- Confirmed donations by event
+- Confirmed donations by camp
+
+## Screenshots
+
+### Home Page
+
+![Home Page](screenshots/home-page.png)
+
+### Camps Page
+
+![Camps Page](screenshots/camps-page.png)
+
+### Registration Page
+
+![Registration Page](screenshots/register-page.png)
+
+### Admin Dashboard
+
+![Admin Dashboard](screenshots/admin-dashboard.png)
+
+### Donation Desk
+
+![Donation Desk](screenshots/donation-desk.png)
+
+### Manual Donor Entry
+
+![Manual Donor Entry](screenshots/manual-donor-entry.png)
+
+### Live Dashboard
+
+![Live Dashboard](screenshots/live-dashboard.png)
 
 ## Project Structure
 
@@ -137,8 +167,8 @@ npm run dev
 
 ### Donor Registration
 
-1. User opens the events page
-2. User selects an event
+1. User opens the camps page
+2. User selects a camp
 3. User completes donor registration
 4. Registration is stored in MongoDB
 
@@ -151,9 +181,9 @@ npm run dev
 
 ### Manual Donor Entry
 
-1. Admin selects an existing event
+1. Admin selects an existing camp
 2. Admin adds staff or guest/management donor details
-3. Dashboard updates demographics and event totals
+3. Dashboard updates demographics and camp totals
 
 ## API Overview
 
