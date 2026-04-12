@@ -24,16 +24,24 @@ const { sendOTP, verifyOTP } = require("../controllers/OTPController");
 const { adminLogin } = require("../controllers/LoginController");
 
 // Configure Multer for Image Uploads (Events & Gallery)
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    // Determine folder based on fieldname
-    const folder = file.fieldname === "eventImage" ? "Events" : "Gallery";
-    cb(null, path.join(__dirname, `../${folder}`));
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
+
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: (req, file) => ({
+    folder: file.fieldname === 'eventImage' ? 'blood-donation/events' : 'blood-donation/gallery',
+    allowed_formats: ['jpg', 'jpeg', 'png'],
+    public_id: Date.now().toString(),
+  }),
+});
+
 const upload = multer({ storage });
 
 // --- ROUTES ---
