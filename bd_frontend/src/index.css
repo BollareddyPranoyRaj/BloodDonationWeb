@@ -194,22 +194,24 @@ code {
 }
 
 .dashboard-donut-center-label {
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: #94a3b8;
+  color: #6c757d; /* A slightly darker gray for better readability */
 }
 
 .dashboard-donut-center-value {
-  font-size: 2.4rem;
+  font-size: 2.8rem; /* Made it slightly larger so the number pops */
+  font-weight: 800;
   line-height: 1;
-  color: #0f172a;
+  color: #1e293b; /* Dark slate color for a professional look */
 }
 
 .dashboard-donut-center-foot {
-  font-size: 0.82rem;
-  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #e11d48; /* Your custom Aditya Red */
 }
 
 @media (max-width: 991px) {
