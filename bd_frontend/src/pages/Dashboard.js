@@ -106,10 +106,9 @@ const Dashboard = () => {
         eventCounts[eventName] = (eventCounts[eventName] || 0) + 1;
       });
 
-      const formattedPieData = Object.keys(eventCounts).map(key => ({
-        name: key,
-        value: eventCounts[key]
-      }));
+      const formattedPieData = Object.keys(eventCounts)
+        .map(key => ({ name: key, value: eventCounts[key] }))
+        .sort((a, b) => b.value - a.value); // <-- This forces largest to smallest!
 
       setOverviewData({
         NumberOfDonors: totalConfirmedDonors,
