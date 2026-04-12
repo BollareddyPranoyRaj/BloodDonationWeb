@@ -2,6 +2,14 @@
 
 Full-stack blood donation management platform built for Aditya University. The application supports camp-based donor registration, admin-side camp management, donation confirmation, manual donor entry for staff and guest/management donors, gallery management, and a live dashboard for tracking donation activity.
 
+## 🚀 Live Demo
+
+- **Frontend:** https://blood-donation-web-gamma.vercel.app
+- **Backend API:** https://blood-donation-backend-7wkw.onrender.com
+
+> ⚠️ Note: Backend is hosted on Render free tier — first request may take ~50 seconds to wake up.
+
+
 ## Highlights
 
 - Camp-based donor registration flow
