@@ -578,12 +578,19 @@ const AdminDashboard = () => {
                                   </Form.Select>
                                 </Form.Group>
                                 <Form.Group className="mb-3">
-                                  <Form.Label className="fw-semibold">Mobile Number</Form.Label>
-                                  <Form.Control type="tel" name="MobileNumber" value={guestManagementData.MobileNumber} onChange={handleGuestManagementChange} required />
+                                  <Form.Label className="fw-semibold">College / Organization</Form.Label>
+                                  <Form.Select name="CollegeName" value={guestManagementData.CollegeName} onChange={handleGuestManagementChange} required>
+                                    <option value="">Select a college</option>
+                                    <option value="Aditya University">Aditya University</option>
+                                    <option value="Aditya College of Engineering & Technology">Aditya College of Engineering & Technology</option>
+                                    <option value="Aditya College of Pharmacy">Aditya College of Pharmacy</option>
+                                    <option value="Aditya Polytechnic College">Aditya Polytechnic College</option>
+                                    <option value="External Guest">External Guest</option>
+                                  </Form.Select>
                                 </Form.Group>
                                 <Form.Group className="mb-3">
-                                  <Form.Label className="fw-semibold">Email</Form.Label>
-                                  <Form.Control type="email" name="Email" placeholder="Optional" value={guestManagementData.Email} onChange={handleGuestManagementChange} />
+                                  <Form.Label className="fw-semibold">Mobile Number</Form.Label>
+                                  <Form.Control type="tel" name="MobileNumber" value={guestManagementData.MobileNumber} onChange={handleGuestManagementChange} required />
                                 </Form.Group>
                                 <Row>
                                   <Col sm={6}>
