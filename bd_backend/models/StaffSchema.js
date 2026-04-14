@@ -17,6 +17,10 @@ const StaffSchema = mongoose.Schema({
         type: Number,
         required: true
     },
+    Email: {
+        type: String,
+        default: ''
+    },
     EventDate: {
         type: Date,
         required: true
