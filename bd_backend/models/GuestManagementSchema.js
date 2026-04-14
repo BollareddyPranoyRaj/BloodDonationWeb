@@ -10,6 +10,10 @@ const GuestManagementSchema = mongoose.Schema({
         enum: ['Guest', 'Management'],
         required: true
     },
+    CollegeName: {
+        type: String,
+        default: ''
+    },
     MobileNumber: {
         type: Number,
         required: true

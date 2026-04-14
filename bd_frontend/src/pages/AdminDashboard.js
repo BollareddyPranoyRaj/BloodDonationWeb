@@ -39,7 +39,7 @@ const AdminDashboard = () => {
 
   // --- Guest Management State ---
   const [guestManagementData, setGuestManagementData] = useState({
-    Name: '', TypeOfDonor: 'Guest', MobileNumber: '',
+    Name: '', TypeOfDonor: 'Guest', MobileNumber: '', CollegeName: '',
     EventDate: new Date().toISOString().split('T')[0], Venue: '', BloodGroup: '',
   });
   const [guestManagementLoading, setGuestManagementLoading] = useState(false);
@@ -288,7 +288,7 @@ const AdminDashboard = () => {
   };
 
   const resetGuestManagementForm = () => setGuestManagementData({
-    Name: '', TypeOfDonor: 'Guest', MobileNumber: '',
+    Name: '', TypeOfDonor: 'Guest', MobileNumber: '', CollegeName: '',
     EventDate: new Date().toISOString().split('T')[0], Venue: '', BloodGroup: '',
   });
 
