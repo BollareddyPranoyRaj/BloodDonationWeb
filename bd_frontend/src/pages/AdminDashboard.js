@@ -32,7 +32,7 @@ const AdminDashboard = () => {
 
   // --- Staff State ---
   const [staffData, setStaffData] = useState({
-    StaffName: '', StaffId: '', CollegeName: '', MobileNumber: '',
+    StaffName: '', StaffId: '', CollegeName: '', MobileNumber: '', Email: '',
     EventDate: new Date().toISOString().split('T')[0], Venue: '', BloodGroup: '',
   });
   const [staffLoading, setStaffLoading] = useState(false);
