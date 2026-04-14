@@ -513,8 +513,14 @@ const AdminDashboard = () => {
                                   <Form.Control type="text" name="StaffId" value={staffData.StaffId} onChange={handleStaffChange} required />
                                 </Form.Group>
                                 <Form.Group className="mb-3">
-                                  <Form.Label className="fw-semibold">College / Organization</Form.Label>
-                                  <Form.Control type="text" name="CollegeName" value={staffData.CollegeName} onChange={handleStaffChange} required />
+                                <Form.Label className="fw-semibold">College / Organization</Form.Label>
+                                  <Form.Select name="CollegeName" value={staffData.CollegeName} onChange={handleStaffChange} required>
+                                    <option value="">Select a college</option>
+                                    <option value="Aditya University">Aditya University</option>
+                                    <option value="Aditya College of Engineering & Technology">Aditya College of Engineering & Technology</option>
+                                    <option value="Aditya College of Pharmacy">Aditya College of Pharmacy</option>
+                                    <option value="Aditya Polytechnic College">Aditya Polytechnic College</option>
+                                  </Form.Select>
                                 </Form.Group>
                                 <Form.Group className="mb-3">
                                   <Form.Label className="fw-semibold">Mobile Number</Form.Label>
