@@ -575,6 +575,10 @@ const AdminDashboard = () => {
                                   <Form.Label className="fw-semibold">Mobile Number</Form.Label>
                                   <Form.Control type="tel" name="MobileNumber" value={guestManagementData.MobileNumber} onChange={handleGuestManagementChange} required />
                                 </Form.Group>
+                                <Form.Group className="mb-3">
+                                  <Form.Label className="fw-semibold">Email</Form.Label>
+                                  <Form.Control type="email" name="Email" placeholder="Optional" value={guestManagementData.Email} onChange={handleGuestManagementChange} />
+                                </Form.Group>
                                 <Row>
                                   <Col sm={6}>
                                     <Form.Group className="mb-3">
