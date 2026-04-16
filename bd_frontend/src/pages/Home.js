@@ -10,7 +10,7 @@ const Home = () => {
         <Container className="py-5">
           <h1 className="display-4 fw-bold mb-3">Give Blood, Save Lives</h1>
           <p className="lead mb-4">
-            Join Aditya University's blood donation drive. Your single donation can save up to three lives and make a massive impact in our community.
+            Join in blood donation drive. Your single donation can save up to three lives and make a massive impact in our community.
           </p>
           <Link to="/register">
             <Button variant="light" size="lg" className="text-danger fw-bold px-5 py-3 rounded-pill shadow-sm">
