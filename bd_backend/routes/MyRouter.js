@@ -8,6 +8,7 @@ const {
   getRegistrations,
   findRegistration,
   confirmDonation,
+  getRegistrationStatusByRollNumber,
 } = require("../controllers/RegistrationController");
 const { createEvent, getEvents, deleteEvent } = require("../controllers/EventController");
 const {
@@ -54,6 +55,7 @@ router.post("/verify-otp", verifyOTP);
 router.post("/register", createRegistration);
 router.get("/registrations", getRegistrations);
 router.get("/registrations/search", findRegistration);
+router.get("/registrations/status/:rollno", getRegistrationStatusByRollNumber);
 router.post("/registrations/confirm-donation", confirmDonation);
 
 // 3. Events (with Image Upload)

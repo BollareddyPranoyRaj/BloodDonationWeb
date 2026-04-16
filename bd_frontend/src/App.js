@@ -17,6 +17,7 @@ import GalleryPage from './pages/GalleryPage';
 import EventsPage from './pages/EventsPage';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
+import CheckStatus from './pages/CheckStatus';
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/gallery" element={<GalleryPage />} />
             <Route path="/events" element={<EventsPage />} />
+            <Route path="/check-status" element={<CheckStatus />} />
             <Route path="/admin" element={<AdminLogin />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
           </Routes>
