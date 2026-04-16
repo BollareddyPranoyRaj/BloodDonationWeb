@@ -14,7 +14,7 @@ const Navigation = () => {
     <Navbar bg="white" expand="lg" sticky="top" className="shadow-sm py-3">
       <Container>
         <Navbar.Brand as={Link} to="/" className="fw-bold text-danger fs-4 d-flex align-items-center">
-          <span className="me-2 fs-3">🩸</span> Aditya Blood Care
+          <span className="me-2 fs-3">🩸</span> Blood Care
         </Navbar.Brand>
         
         <Navbar.Toggle aria-controls="basic-navbar-nav" className="border-0 shadow-none" />
