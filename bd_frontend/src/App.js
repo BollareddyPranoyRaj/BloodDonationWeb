@@ -1,4 +1,5 @@
 import React from 'react';
+import { Analytics } from "@vercel/analytics/react";
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -50,6 +51,7 @@ function App() {
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
           </Routes>
         </main>
+        <Analytics />
       </div>
     </Router>
   );
