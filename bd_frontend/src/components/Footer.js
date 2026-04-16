@@ -8,7 +8,7 @@ const Footer = () => {
       <Container>
         <Row className="g-4">
           <Col md={4}>
-            <h5 className="text-danger fw-bold mb-3">🩸 Aditya Blood Care</h5>
+            <h5 className="text-danger fw-bold mb-3">🩸 Blood Care</h5>
             <p className="text-white-50 pe-md-4">
               Dedicated to saving lives through voluntary blood donation across Aditya University campuses. Every drop counts.
             </p>
