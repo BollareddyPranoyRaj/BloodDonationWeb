@@ -133,6 +133,55 @@ const createRegistration = async (req, res) => {
   }
 };
 
+const getRegistrationStatusByRollNumber = async (req, res) => {
+  try {
+    const { rollno } = req.params;
+
+    if (!rollno) {
+      return res.status(400).json({ message: "rollno is required" });
+    }
+
+    const normalizedRollNo = rollno.trim();
+    const registrations = await Register.find({
+      rollno: { $regex: `^${normalizedRollNo}$`, $options: "i" },
+    }).sort({ EventDate: -1, createdAt: -1, _id: -1 });
+
+    if (!registrations.length) {
+      return res.status(404).json({
+        found: false,
+        status: "not-registered",
+        message: "This roll number is not registered for blood donation yet.",
+      });
+    }
+
+    const donatedRegistration = registrations.find((registration) => registration.donated);
+    const latestRegistration = registrations[0];
+    const referenceRegistration = donatedRegistration || latestRegistration;
+
+    return res.status(200).json({
+      found: true,
+      status: donatedRegistration ? "donated" : "registered",
+      message: donatedRegistration
+        ? "Donation confirmed successfully for this donor."
+        : "This donor is registered but not yet marked as donated.",
+      donor: {
+        studentname: referenceRegistration.studentname,
+        rollno: referenceRegistration.rollno,
+        branch: referenceRegistration.branch,
+        college: referenceRegistration.college,
+        eventDate: referenceRegistration.EventDate,
+        eventName:
+          referenceRegistration.SelectedEventName || "Blood Donation Camp",
+        donatedAt: referenceRegistration.donatedAt,
+        registrationsCount: registrations.length,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching registration status by roll number:", error);
+    return res.status(500).json({ message: "Error fetching donor status" });
+  }
+};
+
 const findRegistration = async (req, res) => {
   try {
     const { rollno, eventDate } = req.query;
@@ -250,4 +299,5 @@ module.exports = {
   getRegistrations,
   findRegistration,
   confirmDonation,
+  getRegistrationStatusByRollNumber,
 };
