@@ -61,6 +61,19 @@ const EventsPage = () => {
     storeSelectedEvent(selectedEvent);
   };
 
+  const handleCheckStatus = (event) => {
+    handleSelectEvent(event);
+    navigate('/check-status', {
+      state: {
+        event: {
+          _id: event._id,
+          EventName: event.EventName,
+          EventDate: new Date(event.Date).toISOString().split('T')[0],
+        },
+      },
+    });
+  };
+
   return (
     <div className="events-page bg-light min-vh-100 pb-5">
       <div className="bg-danger text-white py-5 mb-5 shadow-sm text-center">
@@ -142,7 +155,7 @@ const EventsPage = () => {
                         )}
                       </div>
 
-                      <div className="d-flex gap-2 mt-4">
+                      <div className="d-flex flex-wrap gap-2 mt-4">
                         <Button
                           variant={isSelected ? 'danger' : 'outline-danger'}
                           className="rounded-pill px-4 fw-semibold"
@@ -159,6 +172,13 @@ const EventsPage = () => {
                           }}
                         >
                           Register Here
+                        </Button>
+                        <Button
+                          variant="outline-primary"
+                          className="rounded-pill px-4 fw-semibold"
+                          onClick={() => handleCheckStatus(event)}
+                        >
+                          Check My Status
                         </Button>
                       </div>
                     </div>
